@@ -7,7 +7,6 @@ export const LoginDto = z.object({
 });
 
 export const RegisterDto = z.object({
-  name:     z.string().min(2).max(80),
   email:    z.string().email(),
   password: z
     .string()

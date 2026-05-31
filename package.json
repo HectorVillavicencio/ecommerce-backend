@@ -12,30 +12,47 @@
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^17.4.2",
-    "express": "^4.21.0",
-    "express-rate-limit": "^7.4.0",
-    "helmet": "^8.0.0",
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.2.0",
     "hpp": "^0.2.3",
-    "jsonwebtoken": "^9.0.2",
-    "zod": "^3.23.8"
+    "jsonwebtoken": "^9.0.3",
+    "pdfkit": "^0.18.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
+    "@types/express": "^5.0.6",
     "@types/hpp": "^0.2.6",
-    "@types/jest": "^29.5.13",
-    "@types/jsonwebtoken": "^9.0.7",
+    "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.19.19",
+    "@types/pdfkit": "^0.17.6",
+    "dotenv": "^17.4.2",
     "jest": "^29.7.0",
     "prisma": "^5.22.0",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.4.11",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.9.3"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
-  }
+  },
+  "description": "",
+  "main": "jest.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HectorVillavicencio/ecommerce-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HectorVillavicencio/ecommerce-backend/issues"
+  },
+  "homepage": "https://github.com/HectorVillavicencio/ecommerce-backend#readme"
 }

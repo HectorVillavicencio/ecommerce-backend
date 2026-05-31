@@ -4,8 +4,11 @@ import { env }   from './config/env';
 import { prisma } from './config/prisma';
 import { router } from './routes';
 import { errorHandler } from './errors/errorHandler';
+import express from 'express';
+import path    from 'path';
 
 // Registrar rutas
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/api/v1', router);
 app.use(errorHandler);
 

@@ -1,10 +1,10 @@
-import jwt  from 'jsonwebtoken';
+import jwt   from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { UserRepository } from '../repositories/UserRepository';
-import { AppError }       from '../errors/AppError';
-import { env }            from '../config/env';
-import { LoginInput, RegisterInput, UserResponseDto } from '../dtos/auth.dto';
-import { JwtPayload }     from '../interfaces/JwtPayload';
+import { UserRepository }  from '../repositories/UserRepository';
+import { AppError }        from '../errors/AppError';
+import { env }             from '../config/env';
+import { LoginInput, RegisterInput } from '../dtos/auth.dto';
+import { JwtPayload }      from '../interfaces/JwtPayload';
 
 export class AuthService {
   constructor(private readonly userRepo: UserRepository) {}
@@ -14,7 +14,14 @@ export class AuthService {
     if (exists) throw new AppError('El email ya está registrado', 409);
 
     const user = await this.userRepo.create(dto);
-    return UserResponseDto.parse(user);
+
+    // Devolvemos solo los campos seguros, sin usar UserResponseDto
+    return {
+      id:        user.id,
+      email:     user.email,
+      role:      user.role,
+      createdAt: user.createdAt,
+    };
   }
 
   async login(dto: LoginInput) {
@@ -24,17 +31,25 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.password);
     if (!valid) throw new AppError('Credenciales inválidas', 401);
 
-    const payload: JwtPayload = { userId: user.id, role: user.role as 'admin' | 'customer' };
+    const payload: JwtPayload = {
+      userId: user.id,
+      role:   user.role as 'admin' | 'customer',
+    };
 
-    const accessToken  = jwt.sign(payload, env.jwtSecret,        { expiresIn: env.jwtExpiresIn as any });
-    const refreshToken = jwt.sign(payload, env.jwtRefreshSecret,  { expiresIn: env.jwtRefreshExpiresIn as any });
+    const accessToken  = jwt.sign(payload, env.jwtSecret,       { expiresIn: env.jwtExpiresIn as any });
+    const refreshToken = jwt.sign(payload, env.jwtRefreshSecret, { expiresIn: env.jwtRefreshExpiresIn as any });
 
     await this.userRepo.saveRefreshToken(user.id, refreshToken);
 
     return {
       accessToken,
       refreshToken,
-      user: UserResponseDto.parse(user),
+      user: {
+        id:        user.id,
+        email:     user.email,
+        role:      user.role,
+        createdAt: user.createdAt,
+      },
     };
   }
 
@@ -47,9 +62,12 @@ export class AuthService {
         throw new AppError('Refresh token inválido', 401);
       }
 
-      const newPayload: JwtPayload = { userId: user.id, role: user.role as 'admin' | 'customer' };
-      const accessToken = jwt.sign(newPayload, env.jwtSecret, { expiresIn: env.jwtExpiresIn as any });
+      const newPayload: JwtPayload = {
+        userId: user.id,
+        role:   user.role as 'admin' | 'customer',
+      };
 
+      const accessToken = jwt.sign(newPayload, env.jwtSecret, { expiresIn: env.jwtExpiresIn as any });
       return { accessToken };
     } catch {
       throw new AppError('Refresh token inválido o expirado', 401);

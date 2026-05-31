@@ -1,4 +1,7 @@
-### Registrar usuario admin
+### Health check
+GET http://localhost:3000/health
+
+### Registrar
 POST http://localhost:3000/api/v1/auth/register
 Content-Type: application/json
 
@@ -13,6 +16,16 @@ POST http://localhost:3000/api/v1/auth/login
 Content-Type: application/json
 
 {
+  "email": "admin@ecommerce.com",
+  "password": "Admin1234"
+}
+
+### Registrar
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "name": "Administrador",
   "email": "admin@ecommerce.com",
   "password": "Admin1234"
 }

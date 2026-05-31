@@ -1,13 +1,31 @@
-import { ProductRepository } from '../repositories/ProductRepository';
-import { AppError }          from '../errors/AppError';
-import { CreateProductInput, UpdateProductInput, ProductResponseDto } from '../dtos/product.dto';
+import { ProductRepository }  from '../repositories/ProductRepository';
+import { AppError }           from '../errors/AppError';
+import {
+  CreateProductInput,
+  UpdateProductInput,
+  ProductQueryInput,
+  ProductResponseDto,
+} from '../dtos/product.dto';
 
 export class ProductService {
   constructor(private readonly repo: ProductRepository) {}
 
-  async findAll() {
-    const products = await this.repo.findAll();
-    return products.map(p => ProductResponseDto.parse(p));
+  async findAll(query: ProductQueryInput) {
+    const { products, total } = await this.repo.findAll(query);
+    const { page, limit } = query;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: products.map(p => ProductResponseDto.parse(p)),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    };
   }
 
   async findById(id: number) {
@@ -17,11 +35,9 @@ export class ProductService {
   }
 
   async create(dto: CreateProductInput) {
-    // Regla: slug único
     const exists = await this.repo.findBySlug(dto.slug);
     if (exists) throw new AppError('El slug ya está en uso', 409);
 
-    // Regla: todas las variantes deben tener precio positivo
     if (dto.variants.some(v => v.price <= 0)) {
       throw new AppError('El precio de todas las variantes debe ser mayor a 0', 422);
     }
@@ -31,9 +47,21 @@ export class ProductService {
   }
 
   async update(id: number, dto: UpdateProductInput) {
-    await this.findById(id); // lanza 404 si no existe
+    await this.findById(id);
     const updated = await this.repo.update(id, dto);
     return ProductResponseDto.parse(updated);
+  }
+
+  // Ocultar o mostrar un producto completo
+  async toggleActive(id: number, active: boolean) {
+    await this.findById(id);
+    return this.repo.toggleActive(id, active);
+  }
+
+  // Ocultar o mostrar una variante individual
+  async toggleVariantActive(productId: number, variantId: number, isActive: boolean) {
+    await this.findById(productId); // verifica que el producto existe
+    return this.repo.toggleVariantActive(variantId, isActive);
   }
 
   async delete(id: number) {
